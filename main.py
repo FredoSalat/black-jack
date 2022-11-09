@@ -132,6 +132,8 @@ if __name__ == '__main__':
                         break
 
         while dealer_hit:
+
+            dealer.ace_checker()
             for d_card in dealer.dealer_cards_on_hand:
                 dealer_hand.total_count += d_card.value
             print(dealer_hand.total_count)
