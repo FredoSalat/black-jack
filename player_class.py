@@ -40,8 +40,6 @@ class Player(EntityAtTable):
         if self.balance <= 0:
             print(f"{self.name} you have no balance, you have been removed from the table.")
             del self
-        else:
-            return self.balance
 
     def balance_insert(self):
         self.balance += self.bet * 2

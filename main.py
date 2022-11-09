@@ -74,10 +74,11 @@ if __name__ == '__main__':
         # Loops through the players and resets their bet and total count for every hand before asking them for the
         # bet of the current round
         for player in players:
+            players_left_in_round.append(player)
             player.bet = 0
             player.total_count = 0
             player.bet = player.place_bet()
-            players_left_in_round.append(player)
+
 
         # Loops through a list of all entities (players and dealer)
         for entity in list_of_entities:
@@ -103,14 +104,17 @@ if __name__ == '__main__':
 
                 if player.bust_checker():  # Checking if the player is over 21
                     print(f'{player.name} you are bust')  # Informing the player of being bust
-                    player.balance = player.balance_withdraw()  # Adjusts the balance and removes the player if the balance is equal to zero
-                    del players_left_in_round[player]
+                    player.balance_withdraw()  # Adjusts the balance and removes the player if the balance is equal to zero
+                    if player in players_left_in_round:
+                        players_left_in_round.remove(player)
+                    else:
+                        print("Player is not in the list")
                     if player == players[-1]:
                         dealer_hit = True
                         player_hitting = False
                         break
                     else:
-                        continue
+                        break
 
                 else:
                     answer = int(input("Press 1 to get another card. Press 2 to pass"))
@@ -143,10 +147,9 @@ if __name__ == '__main__':
                     print(
                         f'{player.name} you lost this round. Your count was {player.total_count} and the dealer was {dealer.total_count}')
                     player.balance_withdraw()
-                    dealer_hit_me = False
-                    break
+                    dealer_hit = False
 
             for player in players_left_in_round:
                 if dealer.total_count < player.total_count:
-                    dealer.get_card(deck.deal())
+                    dealer.hit(deck.deal())
                     continue
