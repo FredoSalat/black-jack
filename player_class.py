@@ -20,27 +20,34 @@ class Player(EntityAtTable):
             try:
                 self.bet = int(input(
                     f"{self.name} how much do you want to bet this round? Your current balance is {self.balance}"))
-
             except ValueError:
                 print("Please enter a valid integer")
             else:
-
                 if 0 < self.bet <= self.balance:
                     break
-
                 else:
                     print(f"Please enter a bet larger than 0 and less than {self.balance}")
+
+        return self.bet
 
     def display_cards(self):
         print(f"{self.name}, these are the cards you currently have on hand: ")
         for card in self.cards_on_hand:
             print(card)
 
-    def balance_adjust(self):
+    def balance_withdraw(self):
         self.balance = self.balance - self.bet
         if self.balance <= 0:
             print(f"{self.name} you have no balance, you have been removed from the table.")
             del self
+        else:
+            return self.balance
+
+    def balance_insert(self):
+        self.balance += self.bet * 2
+
+    def win_check(self):
+        pass
 
     def __str__(self):
         return self.name

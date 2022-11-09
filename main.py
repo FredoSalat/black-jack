@@ -44,19 +44,7 @@ def players_at_table():
     return list_of_players
 
 
-def display_dealer_cards():
-    pass
-
-
-def display_player_cards():
-    pass
-
-
 def dealer_win_check():
-    pass
-
-
-def player_win_check():
     pass
 
 
@@ -81,6 +69,7 @@ if __name__ == '__main__':
     # Most outer while-loop within a hand that controls the must-haves of each round (two cards for each player and
     # the dealer)
     while playing_hand:
+        players_left_in_round = []
 
         # Loops through the players and resets their bet and total count for every hand before asking them for the
         # bet of the current round
@@ -88,6 +77,7 @@ if __name__ == '__main__':
             player.bet = 0
             player.total_count = 0
             player.bet = player.place_bet()
+            players_left_in_round.append(player)
 
         # Loops through a list of all entities (players and dealer)
         for entity in list_of_entities:
@@ -113,8 +103,14 @@ if __name__ == '__main__':
 
                 if player.bust_checker():  # Checking if the player is over 21
                     print(f'{player.name} you are bust')  # Informing the player of being bust
-                    player.balance_adjust()  # Adjusts the balance and removes the player if the balance is equal to zero
-                    break
+                    player.balance = player.balance_withdraw()  # Adjusts the balance and removes the player if the balance is equal to zero
+                    del players_left_in_round[player]
+                    if player == players[-1]:
+                        dealer_hit = True
+                        player_hitting = False
+                        break
+                    else:
+                        continue
 
                 else:
                     answer = int(input("Press 1 to get another card. Press 2 to pass"))
@@ -134,27 +130,23 @@ if __name__ == '__main__':
         while dealer_hit:
 
             dealer.ace_checker()
-            for d_card in dealer.dealer_cards_on_hand:
-                dealer_hand.total_count += d_card.value
-            print(dealer_hand.total_count)
 
-            if dealer_hand.total_count > 21:
-                print(
-                    f'{player.name} you won this round. Your count was {player_1_hand.total_count} and the dealer was {tot_dealer_count}')
-                dealer_hit_me = False
-                player.balance += bet * 2
-                break
+            if dealer.bust_checker():
+                for player in players_left_in_round:
+                    print(f'{player.name} you won this round')
+                    player.balance_insert()
+                    dealer_hit = False
+                    break
 
-            if dealer_hand.total_count > player_1_hand.total_count:
-                print(
-                    f'{player.name} you lost this round. Your count was {player_1_hand.total_count} and the dealer was {tot_dealer_count}')
-                dealer_hit_me = False
-                player.balance = player.balance - bet
-                if player.balance <= 0:
-                    game_on = False
-                break
+            for player in players_left_in_round:
+                if dealer.total_count > player.total_count:
+                    print(
+                        f'{player.name} you lost this round. Your count was {player.total_count} and the dealer was {dealer.total_count}')
+                    player.balance_withdraw()
+                    dealer_hit_me = False
+                    break
 
-            if dealer_hand.total_count < player_1_hand.total_count:
-                dealer.get_card(new_deck.deal())
-                continue
-
+            for player in players_left_in_round:
+                if dealer.total_count < player.total_count:
+                    dealer.get_card(deck.deal())
+                    continue
