@@ -19,13 +19,6 @@ values: dict[typing.Union[str, typing.Any], typing.Union[int, typing.Any]] = {'T
                                                                               'Nine': 9, 'Ten': 10, 'Jack': 10,
                                                                               'Queen': 10, 'King': 10, 'Ace': 11}
 
-# Fixa med clear output (kolla tictactoe)
-
-
-# Multiple players: behöver en loop med variabel för varje spelare
-
-
-# ----------
 
 list_of_entities = []
 
@@ -79,7 +72,6 @@ if __name__ == '__main__':
             player.total_count = 0
             player.bet = player.place_bet()
 
-
         # Loops through a list of all entities (players and dealer)
         for entity in list_of_entities:
             entity.hit(deck.deal())
@@ -89,7 +81,7 @@ if __name__ == '__main__':
             entity.display_cards()  # calls the display_card method which is unique to the player and dealer,
             # since the dealer only can show one of the cards on hand
 
-        dealer_hit = False
+        dealer_hit = False  # Sets dealer hit to false to let the players finnish their round before the dealer starts getting more cards
         player_hitting = True
 
         for player in players:
@@ -106,15 +98,17 @@ if __name__ == '__main__':
                     print(f'{player.name} you are bust')  # Informing the player of being bust
                     player.balance_withdraw()  # Adjusts the balance and removes the player if the balance is equal to zero
                     if player in players_left_in_round:
-                        players_left_in_round.remove(player)
+                        players_left_in_round.remove(player)  # Removes the player from the left in round list
+                        if player == players[
+                            -1]:  # If the player is the last one in the list of players it means that the round should be handed over to the dealer
+                            dealer_hit = True
+                            player_hitting = False
+                            # break
+
+                        # else:
+                        # continue
                     else:
                         print("Player is not in the list")
-                    if player == players[-1]:
-                        dealer_hit = True
-                        player_hitting = False
-                        break
-                    else:
-                        break
 
                 else:
                     answer = int(input("Press 1 to get another card. Press 2 to pass"))
@@ -122,34 +116,36 @@ if __name__ == '__main__':
                 if answer == 1:
                     player.hit(deck.deal())
                     player.display_cards()
-                    continue
+                    # continue
 
                 elif answer == 2:
                     if player == players[-1]:
                         dealer_hit = True
                         player_hitting = False
+                        break  # breaking the player hitting-loop and going into the dealer-hit while-loop
                     else:
-                        break
+                        break  # breaking the player hitting-loop and letting the other player play
 
         while dealer_hit:
 
-            dealer.ace_checker()
+            dealer.ace_checker()  # adjusting count for aces
 
-            if dealer.bust_checker():
+            if dealer.bust_checker():  # if the dealer is over 21
                 for player in players_left_in_round:
                     print(f'{player.name} you won this round')
                     player.balance_insert()
-                    dealer_hit = False
-                    break
+                dealer_hit = False
+                break
+            elif dealer.total_count > 17: # dealer has to hit until being above 17
+                for player in players_left_in_round:
+                    if dealer.total_count > player.total_count:
+                        print(
+                            f'{player.name} you lost this round. Your count was {player.total_count} and the dealer was {dealer.total_count}')
+                        player.balance_withdraw()
+                dealer_hit = False
+                break
 
-            for player in players_left_in_round:
-                if dealer.total_count > player.total_count:
-                    print(
-                        f'{player.name} you lost this round. Your count was {player.total_count} and the dealer was {dealer.total_count}')
-                    player.balance_withdraw()
-                    dealer_hit = False
-
-            for player in players_left_in_round:
-                if dealer.total_count < player.total_count:
-                    dealer.hit(deck.deal())
-                    continue
+            else:
+                dealer.hit(deck.deal())
+                print(dealer.total_count)
+                continue
