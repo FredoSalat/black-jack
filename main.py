@@ -61,15 +61,16 @@ if __name__ == '__main__':
     # Most outer while-loop within a hand that controls the must-haves of each round (two cards for each player and
     # the dealer)
     while playing_hand:
-        players_left_in_round = []
+        players_left_in_round = []  # resetting the list of players still in the round
 
         # Loops through the players and resets their bet and total count for every hand before asking them for the
         # bet of the current round
-        for player in players:
-            players_left_in_round.append(player)
-            player.bet = 0
-            player.total_count = 0
-            player.bet = player.place_bet()
+        for player in players:  # things that need to happen to each player ahead of every round
+            players_left_in_round.append(player)  # appending each player to be in the round
+            player.bet = 0  # resetting the bet
+            player.total_count = 0  # resetting total count
+            player.cards_on_hand = []  # resetting the cards on hand
+            player.bet = player.place_bet()  # allowing to place a bet
 
         # Loops through a list of all entities (players and dealer)
         for entity in list_of_entities:
@@ -105,14 +106,17 @@ if __name__ == '__main__':
                             # should be handed over to the dealer
                             dealer_hit = True
                             player_hitting = False
-                            break
+                            break  # breaking the loop and thus handing over to the dealer since dealer hit is true
+                            # and player hitting is false
 
                         else:
-                            break # else breaking and handing over the turn to the next player
+                            break  # else breaking and handing over the turn to the next player
                     else:
                         print("Player is not in the list")
 
-                elif player.total_count == 21:
+                elif player.total_count == 21:  # if the player gets exactly 21 it is automatically turning to the
+                    # next player or going to the dealer
+                    print("You've got 21 and is automatically passed into the next round")
                     if player == players[-1]:
                         dealer_hit = True
                         player_hitting = False
@@ -142,7 +146,7 @@ if __name__ == '__main__':
 
             if dealer.bust_checker():  # if the dealer is over 21 aka bust
                 for player in players_left_in_round:  # going through all players left in the round
-                    print(f'{player.name} you won this round')  # all players that are not bust will win the round
+                    print(f'{player.name} you won this round Your count was {player.total_count} and the dealer was {dealer.total_count}')  # all players that are not bust will win the round
                     player.balance_insert()
                 dealer_hit = False  # once all players have been looped through - setting dealer hit to false
                 break  # breaking the loop and going back to a new round
@@ -154,7 +158,7 @@ if __name__ == '__main__':
                             f'{player.name} you lost this round. Your count was {player.total_count} and the dealer was {dealer.total_count}')
                         player.balance_withdraw()
                     else:  # otherwise the player wins the round
-                        print(f'{player.name} you won this round')
+                        print(f'{player.name} you won this round Your count was {player.total_count} and the dealer was {dealer.total_count}')
                         player.balance_insert()
 
                 dealer_hit = False  # once all players have been looped through - setting dealer hit to false
@@ -162,7 +166,7 @@ if __name__ == '__main__':
 
             else:
                 dealer.hit(
-                    deck.deal())  # if non of the above conditions above is fulfilled - the dealer continues to be
+                    deck.deal())  # if none of the above conditions above is fulfilled - the dealer continues to be
                 # given cards
                 print(dealer.total_count)
                 continue
