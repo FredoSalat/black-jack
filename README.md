@@ -1,3 +1,3 @@
-# Black Jack
+# Blackjack
 
-The card game Black Jack written in Python
+The card game Blackjack written in Python
